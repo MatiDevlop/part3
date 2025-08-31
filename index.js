@@ -26,8 +26,8 @@ let persons = [
     }
 ]
 
-const obtenerUltimoId = () => {
-    return Math.max(...persons.map(n => n.id))
+const generateId = () => {
+  return Math.floor(Math.random() * 1000000)
 }
 
 app.get('/api/persons', (req,res) => {
@@ -53,6 +53,13 @@ app.delete('/api/persons/:id', (req,res) => {
     const id = Number(req.params.id)
     persons = persons.filter(p => p.id !== id)
     res.status(204).end()
+})
+
+app.post('/api/persons', (req,res) => {
+    const body = req.body
+    body.id = generateId()
+    console.log(body)
+    res.status(201).json(body)
 })
 
 const PORT = 3001
