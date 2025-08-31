@@ -26,6 +26,10 @@ let persons = [
     }
 ]
 
+const obtenerUltimoId = () => {
+    return Math.max(...persons.map(n => n.id))
+}
+
 app.get('/api/persons', (req,res) => {
     res.json(persons)
 })
@@ -34,6 +38,15 @@ app.get('/info', (req,res)=>{
     const contactos = persons.length
     const fecha = new Date()
     res.send(`<p>Phonebook has info for ${contactos} people</p> <p>${fecha}</p>`)
+})
+
+app.get('/api/persons/:id', (req,res) => {
+    const id = Number(req.params.id)
+    const person = persons.find(p => p.id === id)
+    if (person){
+        return res.json(person)
+    }
+    res.status(404).end()
 })
 
 const PORT = 3001
