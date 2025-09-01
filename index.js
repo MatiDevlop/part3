@@ -57,9 +57,19 @@ app.delete('/api/persons/:id', (req,res) => {
 
 app.post('/api/persons', (req,res) => {
     const body = req.body
-    body.id = generateId()
-    console.log(body)
-    res.status(201).json(body)
+    if(!body.name || !body.number){
+        return res.status(400).json({error: 'name or number is missing'})
+    }
+    else if (persons.find(p => p.name === body.name)){
+        return res.status(400).json({error: 'name must be unique'})
+    }
+    const person = {
+        "id": generateId(),
+        "name": body.name,
+        "number": body.number
+    }
+    persons = persons.concat(person)
+    res.status(201).end()
 })
 
 const PORT = 3001
