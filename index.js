@@ -42,10 +42,6 @@ let persons = [
     }
 ]
 
-const generateId = () => {
-  return Math.floor(Math.random() * 1000000)
-}
-
 app.get('/api/persons', (req,res) => {
     Person.find({}).then(persons => {
         res.json(persons)
@@ -59,12 +55,9 @@ app.get('/info', (req,res)=>{
 })
 
 app.get('/api/persons/:id', (req,res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(p => p.id === id)
-    if (person){
-        return res.json(person)
-    }
-    res.status(404).end()
+    Person.findById(request.params.id).then(person => {
+        res.json(person)
+    })
 })
 
 app.delete('/api/persons/:id', (req,res) => {
@@ -75,19 +68,23 @@ app.delete('/api/persons/:id', (req,res) => {
 
 app.post('/api/persons', (req,res) => {
     const body = req.body
+
     if(!body.name || !body.number){
         return res.status(400).json({error: 'name or number is missing'})
     }
+
     else if (persons.find(p => p.name === body.name)){
         return res.status(400).json({error: 'name must be unique'})
     }
-    const person = {
-        "id": generateId(),
+
+    const person = new Person({
         "name": body.name,
         "number": body.number
-    }
-    persons = persons.concat(person)
-    res.status(201).end()
+    })
+    
+    person.save().then(savedPerson => {
+        res.json(savedPerson)
+    })
 })
 
 const PORT = process.env.PORT
